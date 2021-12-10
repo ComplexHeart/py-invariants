@@ -5,7 +5,7 @@ INVARIANT_NAME = 0
 INVARIANT_METHOD = 1
 INVARIANT_FN_WRAPPER = 'wrapper_fn_invariant'
 INVARIANT_INVALID_RETURN_TYPE_MESSAGE = 'Invariant return value must be boolean.'
-INVARIANT_VIOLATION_MESSAGE = 'Unable create {} due to {}'
+INVARIANT_VIOLATION_MESSAGE = 'Unable create {object_name} due to {error}'
 METHOD__INIT = '__init__'
 METHOD__POST_INIT = '__post_init__'
 
@@ -52,8 +52,8 @@ def _check_invariants(self: object) -> None:
     for invariant_fn in _get_invariants(self.__class__):
         if not _invariant_execute(invariant_fn[INVARIANT_METHOD], self):
             raise InvariantViolation(INVARIANT_VIOLATION_MESSAGE.format(
-                self.__class__.__name__,
-                invariant_fn[INVARIANT_NAME].replace("_", " ")
+                object_name=self.__class__.__name__,
+                error=invariant_fn[INVARIANT_NAME].replace("_", " "),
             ))
 
 
