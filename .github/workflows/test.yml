@@ -10,7 +10,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: [ 3.7, 3.8, 3.9 ]
 
     steps:
       - name: Checkout source code
@@ -27,8 +27,12 @@ jobs:
           pip install poetry
           poetry install
 
+      - name: Linting
+        run: |
+          poetry run flake8
+
       - name: Execute Test
-        run: poetry run coverage run --source=complexheart -m behave
+        run: poetry run pytest
 
       - name: Report coverage
         uses: codecov/codecov-action@v1
