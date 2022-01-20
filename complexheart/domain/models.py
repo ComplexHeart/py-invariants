@@ -14,7 +14,7 @@ class InvariantViolation(Exception):
     pass
 
 
-def with_invariants(cls) -> Type:
+def has_invariants(cls) -> Type:
     # Depends on the dataclass package to initialize the class.
     # and register a post init function to execute the invariants.
     # https://docs.python.org/3/library/dataclasses.html#post-init-processing
@@ -34,42 +34,44 @@ def with_invariants(cls) -> Type:
 
 
 def invariant(fn: Callable) -> Callable:
-    def wrapper_fn_invariant(self, *args, **kwargs):
+    def _wrapper_fn_invariant(self, *args, **kwargs):
         return fn(self, *args, **kwargs)
 
-    return wrapper_fn_invariant
+    return _wrapper_fn_invariant
 
 
 def _has__post_init__(cls: object) -> bool:
+    def _is_post_init(method: str) -> bool:
+        return METHOD__POST_INIT in str(method) and METHOD__INIT not in str(method)
+
     return len(inspect.getmembers(cls, _is_post_init)) > 0
 
 
-def _is_post_init(method: str) -> bool:
-    return METHOD__POST_INIT in str(method) and METHOD__INIT not in str(method)
-
-
 def _check_invariants(self: object) -> None:
+    def _make_exception(object_name: str, error: str) -> InvariantViolation:
+        return InvariantViolation(INVARIANT_VIOLATION_MESSAGE.format(
+            object_name=object_name,
+            error=error,
+        ))
+
     for invariant_fn in _get_invariants(self.__class__):
-        if not _invariant_execute(invariant_fn[INVARIANT_METHOD], self):
-            raise InvariantViolation(INVARIANT_VIOLATION_MESSAGE.format(
+        try:
+            if not invariant_fn[INVARIANT_METHOD](self):
+                raise _make_exception(
+                    object_name=self.__class__.__name__,
+                    error=invariant_fn[INVARIANT_NAME].replace("_", " "),
+                )
+
+        except Exception as e:
+            raise _make_exception(
                 object_name=self.__class__.__name__,
-                error=invariant_fn[INVARIANT_NAME].replace("_", " "),
-            ))
+                error=str(e),
+            )
 
 
 def _get_invariants(cls: object) -> Generator:
+    def _is_invariant(method: str) -> bool:
+        return INVARIANT_FN_WRAPPER in str(method) and METHOD__INIT not in str(method)
+
     for member in inspect.getmembers(cls, _is_invariant):
         yield member[INVARIANT_NAME], member[INVARIANT_METHOD]
-
-
-def _is_invariant(method: str) -> bool:
-    return INVARIANT_FN_WRAPPER in str(method) and METHOD__INIT not in str(method)
-
-
-def _invariant_execute(invariant_fn: Callable, self: object) -> bool:
-    resolution = invariant_fn(self)
-
-    if not isinstance(resolution, bool):
-        raise Exception(INVARIANT_INVALID_RETURN_TYPE_MESSAGE)
-
-    return resolution
