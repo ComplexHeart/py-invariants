@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from behave import *
+from behave import given, use_step_matcher, when, then
 
 from complexheart.domainmodel import with_invariants, invariant, InvariantViolation
 
@@ -55,4 +55,4 @@ def step_impl(context):
     """
     :type context: behave.runner.Context
     """
-    assert context.invariant_has_raised_an_error == True
+    assert context.invariant_has_raised_an_error is True

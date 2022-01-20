@@ -24,11 +24,11 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install poetry
+          poetry install
 
       - name: Execute Test
-        run: coverage run --source=complexheart -m behave
+        run: poetry run coverage run --source=complexheart -m behave
 
       - name: Report coverage
         uses: codecov/codecov-action@v1
