@@ -32,25 +32,15 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
+SQLAlchemy = "^1.4.31"
 
 [tool.poetry.dev-dependencies]
-pytest = "^6.1.2"
-pytest-cov = "^2.10.1"
+pytest = "^7.0"
+pytest-cov = "*"
 pytest-mock = "^3.3.1"
-behave = "^1.2.6"
-coverage = { extras = ["toml"], version = "^5.3" }
-flake8 = "~3.8"
-flake8-bugbear = "~20"
-flake8-cognitive-complexity = "^0.1"
-flake8-commas = "~2.0"
-flake8-future-import = "~0.4"
-flake8-import-order = "~0.18"
-flake8-broken-line = "~0.3"
-flake8-comprehensions = "^3.3.1"
-flake8-debugger = "^4.0.0"
-flake8-eradicate = "^1.0.0"
-flake8-string-format = "^0.3.0"
+coverage = { extras = ["toml"], version = "*" }
+flake8 = "*"
 
 [build-system]
 requires = ["poetry-core>=1.0.0", "setuptools>=42"]
